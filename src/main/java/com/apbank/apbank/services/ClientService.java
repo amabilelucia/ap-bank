@@ -23,7 +23,8 @@ public class ClientService {
         Optional<Client> client = clientRepository.findByCpf(clientDTO.cpf());
 
         if (client.isEmpty()) {
-            Client savedClient = clientRepository.save(new Client(clientDTO.cpf(), clientDTO.name(), clientDTO.email()));
+            Client savedClient = clientRepository.save(
+                    new Client(clientDTO.cpf(), clientDTO.name(), clientDTO.email(), clientDTO.active()));
             log.info("Cliente criado. IdClient: {}", savedClient.getIdClient());
             return;
         }

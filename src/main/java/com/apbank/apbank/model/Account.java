@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -30,9 +31,14 @@ public class Account {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Transaction> transactions;
 
-    public Account(AccountType accountType, Client client) {
+    BigDecimal balance = BigDecimal.ZERO;
+
+    boolean active;
+
+    public Account(AccountType accountType, Client client, boolean active) {
         this.accountType = accountType;
         this.client = client;
         this.transactions = null;
+        this.active = true;
     }
 }

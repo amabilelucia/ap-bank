@@ -25,10 +25,14 @@ public class AccountService {
     public void create(AccountDTO accountDTO) {
         try {
             Client client = clientService.findClientById(accountDTO.idClient());
+            if (!client.isActive()) {
+                throw new AccountException("Não é possível criar uma conta, pois o cliente não está ativo");
+            }
+
             Optional<Account> account = accountRepository.findByAccountTypeAndClient(accountDTO.accountType(), client);
 
             if (account.isEmpty()) {
-                Account savedAccount = accountRepository.save(new Account(accountDTO.accountType(), client));
+                Account savedAccount = accountRepository.save(new Account(accountDTO.accountType(), client, accountDTO.active()));
                 log.info("Conta criada com sucesso. idAccount: {}", savedAccount.getIdAccount());
                 return;
             }
@@ -39,5 +43,13 @@ public class AccountService {
         } catch (ClientException ce) {
             throw new AccountException(ce.getMessage());
         }
+    }
+
+    public Account findAccountById(Long idAccount) {
+        return accountRepository.findById(idAccount).orElseThrow(() -> new AccountException("Conta não encontrada"));
+    }
+
+    public void update(Account account) {
+        accountRepository.save(account);
     }
 }

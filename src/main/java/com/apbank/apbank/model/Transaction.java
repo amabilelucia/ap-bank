@@ -2,13 +2,17 @@ package com.apbank.apbank.model;
 
 import com.apbank.apbank.enuns.TransactionType;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
 
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Transaction {
 
     @Id
@@ -23,4 +27,6 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "id_account")
     Account account;
+
+    Long originalTransaction;
 }

@@ -51,6 +51,7 @@ class AccountServiceTest {
     @Test
     void create_whenNewAccount_shouldCreateAccount() {
         when(clientService.findClientById(1L)).thenReturn(client);
+        when(client.isActive()).thenReturn(true);
         when(accountRepository.save(any(Account.class))).thenReturn(account);
 
         accountService.create(accountDTO);
@@ -67,8 +68,16 @@ class AccountServiceTest {
     @Test
     void create_whenTypeAccountExists_shouldThrowException() {
         when(clientService.findClientById(accountDTO.idClient())).thenReturn(client);
+        when(client.isActive()).thenReturn(true);
         when(accountRepository.findByAccountTypeAndClient(accountDTO.accountType(), client))
                 .thenReturn(Optional.of(account));
+        assertThrows(AccountException.class, () -> accountService.create(accountDTO));
+    }
+
+    @Test
+    void create_whenClientIsNotActive_shouldThrowException() {
+        when(clientService.findClientById(accountDTO.idClient())).thenReturn(client);
+        when(client.isActive()).thenReturn(false);
         assertThrows(AccountException.class, () -> accountService.create(accountDTO));
     }
 }

@@ -27,12 +27,15 @@ public class Client {
 
     String email;
 
+    boolean active;
+
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Account> accounts = null;
 
-    public Client(String cpf, String name, String email) {
+    public Client(String cpf, String name, String email, boolean active) {
         this.cpf = cpf;
         this.name = name;
         this.email = email;
+        this.active = active;
     }
 }
