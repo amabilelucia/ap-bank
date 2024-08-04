@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: apbank
+    
+  sql:
+    init:
+      mode: always
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/ap-bank
+    username: postgres
+    password: Postgres2024!
+    initialization-mode: always
+
+  jpa:
+    show-sql: true
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
