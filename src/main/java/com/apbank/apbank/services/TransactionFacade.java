@@ -56,15 +56,13 @@ public class TransactionFacade {
 
     private void deposit(Account account, TransactionDTO transactionDTO) {
         account.setBalance(account.getBalance().add(transactionDTO.amount()));
-        accountService.update(account);
-        transactionService.saveTransaction(transactionDTO, account);
+        updateTransaction(account, transactionDTO);
     }
 
     void transfer(Account account, TransactionDTO transactionDTO) {
         if (account.getBalance().compareTo(transactionDTO.amount()) >= 0) {
             account.setBalance(account.getBalance().subtract(transactionDTO.amount()));
-            accountService.update(account);
-            transactionService.saveTransaction(transactionDTO, account);
+            updateTransaction(account, transactionDTO);
             return;
         }
         throw new TransactionException("Valor insuficiente");
@@ -74,8 +72,7 @@ public class TransactionFacade {
         if (Objects.nonNull(transactionDTO.originalTransaction())) {
             if (verifyRefundValue(transactionDTO)) {
                 account.setBalance(account.getBalance().add(transactionDTO.amount()));
-                accountService.update(account);
-                transactionService.saveTransaction(transactionDTO, account);
+                updateTransaction(account, transactionDTO);
                 return;
             }
             throw new TransactionException("Os cancelamentos ultrapassam o valor da transação original");
@@ -92,5 +89,10 @@ public class TransactionFacade {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return originalTransaction.getAmount().compareTo(refundedValue.add(transaction.amount())) >= 0;
+    }
+
+    void updateTransaction(Account account, TransactionDTO transactionDTO) {
+        accountService.update(account);
+        transactionService.saveTransaction(transactionDTO, account);
     }
 }
