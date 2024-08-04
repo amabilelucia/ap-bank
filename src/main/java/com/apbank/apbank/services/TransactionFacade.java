@@ -1,5 +1,6 @@
 package com.apbank.apbank.services;
 
+import com.apbank.apbank.dto.RefundDTO;
 import com.apbank.apbank.dto.TransactionDTO;
 import com.apbank.apbank.enuns.TransactionType;
 import com.apbank.apbank.exceptions.AccountException;
@@ -25,6 +26,7 @@ public class TransactionFacade {
     ClientService clientService;
     AccountService accountService;
     TransactionService transactionService;
+    KafkaRefundProducer kafkaRefundProducer;
 
     public void executeTransaction(TransactionDTO transactionDTO) {
         try {
@@ -72,7 +74,11 @@ public class TransactionFacade {
         if (Objects.nonNull(transactionDTO.originalTransaction())) {
             if (verifyRefundValue(transactionDTO)) {
                 account.setBalance(account.getBalance().add(transactionDTO.amount()));
-                updateTransaction(account, transactionDTO);
+                accountService.update(account);
+                kafkaRefundProducer.sendRefund(RefundDTO.builder()
+                        .transactionDTO(transactionDTO)
+                        .account(account.getIdAccount())
+                        .build());
                 return;
             }
             throw new TransactionException("Os cancelamentos ultrapassam o valor da transação original");

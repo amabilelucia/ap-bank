@@ -20,3 +20,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  kafka:
+    bootstrap-server: "127.0.0.1:9092"
+    topic:
+      refund: "refund-topic"
