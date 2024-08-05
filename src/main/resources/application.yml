@@ -25,3 +25,6 @@ spring:
     bootstrap-server: "127.0.0.1:9092"
     topic:
       refund: "refund-topic"
+
+  endpoints:
+    refund-service: "localhost:9090"

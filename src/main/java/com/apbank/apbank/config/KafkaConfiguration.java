@@ -13,8 +13,13 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.retry.backoff.FixedBackOffPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
+import org.springframework.util.backoff.FixedBackOff;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,9 +55,35 @@ public class KafkaConfiguration {
     }
 
     @Bean
+    public RetryTemplate retryTemplate() {
+        RetryTemplate retryTemplate = new RetryTemplate();
+
+        // Configuração da política de retentativa
+        SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
+        retryPolicy.setMaxAttempts(5); // Número máximo de retentativas
+        retryTemplate.setRetryPolicy(retryPolicy);
+
+        // Configuração da política de intervalo entre retentativas
+        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
+        backOffPolicy.setBackOffPeriod(2000); // Intervalo em milissegundos entre retentativas
+        retryTemplate.setBackOffPolicy(backOffPolicy);
+
+        return retryTemplate;
+    }
+
+    @Bean
+    public DefaultErrorHandler errorHandler(RetryTemplate retryTemplate) {
+        return new DefaultErrorHandler((record, exception) -> {
+            // Lógica de tratamento de erro
+            System.err.println("Erro ao processar registro: " + record.value());
+        }, new FixedBackOff(2000L, 5L)); // 5 retentativas com intervalo de 2 segundos
+    }
+
+    @Bean
     public ConcurrentKafkaListenerContainerFactory<String, RefundDTO> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, RefundDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(new DefaultKafkaConsumerFactory<>(consumerConfigs()));
+        factory.setCommonErrorHandler(errorHandler(retryTemplate()));
         return factory;
     }
 }
