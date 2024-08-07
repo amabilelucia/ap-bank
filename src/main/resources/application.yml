@@ -27,4 +27,13 @@ spring:
       refund: "refund-topic"
 
   endpoints:
-    refund-service: "localhost:9090"
+    refund-service: "localhost:9095"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: metrics, prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
