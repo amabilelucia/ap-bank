@@ -45,7 +45,7 @@ class AccountServiceTest {
     @BeforeEach
     void setup() {
         openMocks(this);
-        accountDTO = new AccountDTO(AccountType.DEBIT, 1L);
+        accountDTO = new AccountDTO(AccountType.DEBIT, 1L, false);
     }
 
     @Test

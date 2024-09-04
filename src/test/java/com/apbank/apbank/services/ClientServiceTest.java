@@ -35,7 +35,7 @@ class ClientServiceTest {
     @BeforeEach
     void setup() {
         openMocks(this);
-        clientDTO = new ClientDTO("123456789", "Test", "test@test.com");
+        clientDTO = new ClientDTO("123456789", "Test", "test@test.com", false);
     }
 
     @Test

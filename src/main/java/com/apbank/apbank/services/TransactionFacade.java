@@ -70,7 +70,8 @@ public class TransactionFacade {
         throw new TransactionException("Valor insuficiente");
     }
 
-    void refund(Account account, TransactionDTO transactionDTO) {
+    void
+    refund(Account account, TransactionDTO transactionDTO) {
         if (Objects.nonNull(transactionDTO.originalTransaction())) {
             if (verifyRefundValue(transactionDTO)) {
                 account.setBalance(account.getBalance().add(transactionDTO.amount()));
