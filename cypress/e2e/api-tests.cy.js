@@ -20,7 +20,7 @@ describe('Criando cliente com biblioteca que gera dados aleatórios', () => {
       expect(response.status).to.eq(201);
 
       cy.task('queryDatabase', {
-        query: 'SELECT * FROM clientes WHERE cpf = $1',
+        query: 'SELECT * FROM client WHERE cpf = $1',
         params: [randomCPF]
       }).then((rows) => {
         expect(rows).to.have.lengthOf(1);
