@@ -5,7 +5,7 @@ describe('Criando cliente com biblioteca que gera dados aleatórios', () => {
   const randomCPF = faker.string.numeric(11);
   const randomEmail = faker.internet.email();
 
-  it.only('Deve retornar um status 201 e verificar o cliente no banco de dados', () => {
+  it('Deve retornar um status 201 e verificar o cliente no banco de dados', () => {
     cy.request({
       method: 'POST',
       url: 'http://localhost:8080/v1/client/create',
@@ -71,3 +71,72 @@ describe('Testando a Criação de Conta para Cliente Existente', () => {
           });
         });
       });
+
+
+describe('Testando a criação de conta com campo faltando', () => {
+    it('Deve retornar um erro não permitindo a criação da conta sem os campos', () => {
+        const accountData = {
+        accountType: '',
+        idClient: 9,
+        active: true
+        };
+
+   cy.request({
+         method: 'POST',
+         url: 'http://localhost:8080/v1/account/create',
+         body: accountData,
+         failOnStatusCode: false
+       }).then((response) => {
+         cy.log(`Status: ${response.status}`);
+         cy.log(`Response Body: ${JSON.stringify(response.body)}`);
+
+         expect(response.status === 400);
+             });
+           });
+});
+
+describe('Depositando 100 reais em uma conta', () => {
+    it('deve depositar 100 reais na primeira conta', () => {
+       const transactionData = {
+                   amount: 100.0,
+                   account: 1,
+                   transactionType: "DEPOSIT",
+                   originalTransaction: null
+               };
+
+               cy.request({
+                   method: 'POST',
+                   url: 'http://localhost:8080/v1/transaction',
+                   body: transactionData,
+                   failOnStatusCode: false
+               }).then((response) => {
+                   cy.log(`Status: ${response.status}`);
+                   cy.log(`Response Body: ${JSON.stringify(response.body)}`);
+
+                   expect(response.status).to.eq(200);
+               });
+           });
+       });
+
+describe('Tentando Depositar 100 reais em uma conta mas com um campo em branco', () => {
+    it.only('não deve depositar 100 reais na primeira conta', () => {
+       const transactionData = {
+                   amount: 100.0,
+                   account: 1,
+                   transactionType: "",
+                   originalTransaction: null
+               };
+
+               cy.request({
+                   method: 'POST',
+                   url: 'http://localhost:8080/v1/transaction',
+                   body: transactionData,
+                   failOnStatusCode: false
+               }).then((response) => {
+                   cy.log(`Status: ${response.status}`);
+                   cy.log(`Response Body: ${JSON.stringify(response.body)}`);
+
+                   expect(response.status).to.eq(400);
+               });
+           });
+       });
