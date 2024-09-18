@@ -54,7 +54,7 @@ describe('Testando a Criação de Conta para Cliente Existente', () => {
   it('Deve criar uma conta para o cliente existente com id_client e retornar status 201', () => {
     const accountData = {
       accountType: 'MULTI',
-      idClient: 5,
+      idClient: 1,
       active: true
     };
 
@@ -119,7 +119,7 @@ describe('Depositando 100 reais em uma conta', () => {
        });
 
 describe('Tentando Depositar 100 reais em uma conta mas com um campo em branco', () => {
-    it.only('não deve depositar 100 reais na primeira conta', () => {
+    it('não deve depositar 100 reais na primeira conta', () => {
        const transactionData = {
                    amount: 100.0,
                    account: 1,
@@ -140,3 +140,95 @@ describe('Tentando Depositar 100 reais em uma conta mas com um campo em branco',
                });
            });
        });
+
+describe('testando uma tranferencia de 50 reais para a primeira conta', () => {
+    it('deve tranferir 50 reais para a primeira conta com sucesso', () => {
+        const transactionData = {
+        amount: 50.0,
+        account:1,
+        transactionType: "TRANSFER",
+        originalTransaction: null
+        };
+
+        cy.request({
+            method: 'POST',
+            url: '/v1/transaction',
+            body: transactionData,
+            failOnStatusCode: false
+        }).then((response) => {
+            cy.log('Status: $(response.status)');
+            cy.log('response Body: ${JSON.stringify(response.body)}');
+
+            expect(response.status).to.eq(200);
+        })
+    })
+})
+
+describe('Testando uma transferencia de 50 reais mas com um dos campos não preenchidos', () => {
+    it('Não deve fazer a tranferencia', () => {
+        const transactionData = {
+        amount: 50.0,
+        account: 1,
+        transactionType: "",
+        originalTransaction: null
+        };
+
+        cy.request({
+            method: 'POST',
+            url: '/v1/transaction',
+            body: transactionData,
+            failOnStatusCode: false
+        }).then((response) => {
+            cy.log('Status: $(response.status)');
+            cy.log('response Body: ${JSON.stringify(response.body)}');
+
+            expect(response.status).to.eq(400);
+        })
+    })
+})
+
+describe('Testando um cancelamento de 10 reais', () => {
+    it('Deve cancelar 10 reais de uma transferencia', () => {
+        const cancelamento = {
+        amount: 10.0,
+        account: 1,
+        transactionType: "REFUND",
+        originalTransaction: 1,
+        };
+
+        cy.request({
+            method: 'POST',
+            url: '/v1/transaction',
+            body: cancelamento,
+            failOnStatusCode: false
+        }).then((response) => {
+            cy.log('Status: ${response.status}');
+            cy.log('response Body: ${JSON.stringify(response.body)}');
+
+            expect(response.status).to.eq(200);
+        })
+    })
+})
+
+describe('Testando um cancelamento de 10 reais mas com um campo vazio', () => {
+    it.only('Não deve cancelar 10 reais de uma transferencia', () => {
+        const cancelamento = {
+        amount: 10.0,
+        account: "",
+        transactionType: "REFUND",
+        originalTransaction: 1,
+        };
+
+        cy.request({
+            method: 'POST',
+            url: '/v1/transaction',
+            body: cancelamento,
+            failOnStatusCode: false
+        }).then((response) => {
+            cy.log('Status: ${response.status}');
+            cy.log('response Body: ${JSON.stringify(response.body)}');
+
+            expect(response.status).to.eq(400);
+        })
+    })
+})
